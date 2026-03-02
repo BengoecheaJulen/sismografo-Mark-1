@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sismógrafo Cuántico MARK 1</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0F172A; color: #E2E8F0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { text-align: center; padding: 30px 0 20px; }
+        header h1 { font-size: 2em; letter-spacing: 2px; color: #F8FAFC; }
+        header p { color: #94A3B8; margin-top: 5px; }
+        .status-card {
+            background: #1E293B; border-radius: 16px; padding: 30px;
+            margin: 20px 0; border-left: 6px solid #16A34A;
+            display: flex; flex-wrap: wrap; gap: 30px; align-items: center;
+        }
+        .status-main { flex: 1; min-width: 250px; }
+        .status-emoji { font-size: 3em; }
+        .status-label { font-size: 1.5em; font-weight: bold; color: #16A34A; }
+        .status-date { color: #94A3B8; font-size: 0.9em; margin-top: 4px; }
+        .metrics { display: flex; flex-wrap: wrap; gap: 15px; flex: 2; }
+        .metric {
+            background: #334155; border-radius: 10px; padding: 15px 20px;
+            min-width: 140px; flex: 1;
+        }
+        .metric-label { color: #94A3B8; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
+        .metric-value { font-size: 1.6em; font-weight: bold; margin-top: 4px; color: #F8FAFC; }
+        .metric-sub { font-size: 0.75em; color: #64748B; margin-top: 2px; }
+        .chart-container {
+            background: #1E293B; border-radius: 16px; padding: 20px;
+            margin: 20px 0; text-align: center;
+        }
+        .chart-container img { max-width: 100%; border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
+        th { background: #334155; padding: 10px; text-align: left; font-size: 0.85em;
+             color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; }
+        td { padding: 8px 10px; border-bottom: 1px solid #334155; font-size: 0.9em;
+             font-family: 'Courier New', monospace; }
+        tr:hover { background: #334155; }
+        .footer {
+            text-align: center; padding: 30px; color: #475569; font-size: 0.8em;
+        }
+        .footer a { color: #64748B; }
+        .disclaimer {
+            background: #1E293B; border-radius: 10px; padding: 15px; margin: 20px 0;
+            font-size: 0.8em; color: #64748B; border-left: 3px solid #475569;
+        }
+        .tendencia { color: #16A34A; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🟢 SISMÓGRAFO CUÁNTICO</h1>
+            <p>MARK 1 — Modelo Lindblad en H³ — Monitorización en vivo del sentimiento de mercado</p>
+        </header>
+
+        <div class="status-card">
+            <div class="status-main">
+                <div class="status-emoji">🟢</div>
+                <div class="status-label">CALMA</div>
+                <div class="status-date">Actualizado: 27 February 2026</div>
+            </div>
+            <div class="metrics">
+                <div class="metric">
+                    <div class="metric-label">Coherencia C<sub>q</sub></div>
+                    <div class="metric-value">0.1278</div>
+                    <div class="metric-sub">Percentil 4% · <span class="tendencia">↓ Bajando</span></div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Activación Λ</div>
+                    <div class="metric-value">0.0753</div>
+                    <div class="metric-sub">Probabilidad estados extremos</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">σ predicha</div>
+                    <div class="metric-value">2.49%</div>
+                    <div class="metric-sub">σ real: 12.89%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Sesgo Δ</div>
+                    <div class="metric-value">-0.0319</div>
+                    <div class="metric-sub">Euforia</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <h3 style="margin-bottom: 15px; color: #F8FAFC;">Dashboard — Últimos 120 días</h3>
+            <img src="dashboard.png" alt="Dashboard Sismógrafo Cuántico">
+        </div>
+
+        <div class="chart-container">
+            <h3 style="margin-bottom: 15px; color: #F8FAFC;">Registro histórico (últimos 30 días)</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Estado</th>
+                            <th>C<sub>q</sub></th>
+                            <th>Λ</th>
+                            <th>Δ</th>
+                            <th>σ pred</th>
+                            <th>σ real</th>
+                            <th>γ(t)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+        <tr>
+            <td>2026-02-27</td>
+            <td>🟢</td>
+            <td>0.1278</td>
+            <td>0.0753</td>
+            <td>-0.0319</td>
+            <td>0.0249</td>
+            <td>0.1289</td>
+            <td>0.7621</td>
+        </tr>
+        <tr>
+            <td>2026-02-26</td>
+            <td>🟢</td>
+            <td>0.1263</td>
+            <td>0.0802</td>
+            <td>-0.0339</td>
+            <td>0.0258</td>
+            <td>0.1283</td>
+            <td>0.7391</td>
+        </tr>
+        <tr>
+            <td>2026-02-25</td>
+            <td>🟢</td>
+            <td>0.1293</td>
+            <td>0.0868</td>
+            <td>+0.0079</td>
+            <td>0.0275</td>
+            <td>0.1279</td>
+            <td>0.7268</td>
+        </tr>
+        <tr>
+            <td>2026-02-24</td>
+            <td>🟢</td>
+            <td>0.1217</td>
+            <td>0.0894</td>
+            <td>+0.0523</td>
+            <td>0.0274</td>
+            <td>0.1258</td>
+            <td>0.7420</td>
+        </tr>
+        <tr>
+            <td>2026-02-23</td>
+            <td>🟢</td>
+            <td>0.1199</td>
+            <td>0.0862</td>
+            <td>+0.0632</td>
+            <td>0.0265</td>
+            <td>0.1226</td>
+            <td>0.7324</td>
+        </tr>
+        <tr>
+            <td>2026-02-20</td>
+            <td>🟢</td>
+            <td>0.1294</td>
+            <td>0.0783</td>
+            <td>+0.0297</td>
+            <td>0.0257</td>
+            <td>0.1187</td>
+            <td>0.7588</td>
+        </tr>
+        <tr>
+            <td>2026-02-19</td>
+            <td>🟢</td>
+            <td>0.1302</td>
+            <td>0.0705</td>
+            <td>-0.0208</td>
+            <td>0.0241</td>
+            <td>0.1230</td>
+            <td>0.6928</td>
+        </tr>
+        <tr>
+            <td>2026-02-18</td>
+            <td>🟢</td>
+            <td>0.1264</td>
+            <td>0.0752</td>
+            <td>-0.0346</td>
+            <td>0.0248</td>
+            <td>0.1432</td>
+            <td>0.5315</td>
+        </tr>
+        <tr>
+            <td>2026-02-17</td>
+            <td>🟢</td>
+            <td>0.1315</td>
+            <td>0.0887</td>
+            <td>-0.0236</td>
+            <td>0.0281</td>
+            <td>0.1416</td>
+            <td>0.5211</td>
+        </tr>
+        <tr>
+            <td>2026-02-13</td>
+            <td>🟢</td>
+            <td>0.1425</td>
+            <td>0.1084</td>
+            <td>+0.0070</td>
+            <td>0.0338</td>
+            <td>0.1419</td>
+            <td>0.5524</td>
+        </tr>
+        <tr>
+            <td>2026-02-12</td>
+            <td>🟢</td>
+            <td>0.1835</td>
+            <td>0.1331</td>
+            <td>+0.0569</td>
+            <td>0.0448</td>
+            <td>0.1428</td>
+            <td>0.5775</td>
+        </tr>
+        <tr>
+            <td>2026-02-11</td>
+            <td>🟢</td>
+            <td>0.2316</td>
+            <td>0.1652</td>
+            <td>+0.0961</td>
+            <td>0.0607</td>
+            <td>0.1323</td>
+            <td>0.5788</td>
+        </tr>
+        <tr>
+            <td>2026-02-10</td>
+            <td>🟢</td>
+            <td>0.2570</td>
+            <td>0.1859</td>
+            <td>+0.1105</td>
+            <td>0.0715</td>
+            <td>0.1324</td>
+            <td>0.5647</td>
+        </tr>
+        <tr>
+            <td>2026-02-09</td>
+            <td>🟢</td>
+            <td>0.3157</td>
+            <td>0.1686</td>
+            <td>+0.1456</td>
+            <td>0.0743</td>
+            <td>0.1338</td>
+            <td>0.5443</td>
+        </tr>
+        <tr>
+            <td>2026-02-06</td>
+            <td>🟢</td>
+            <td>0.2723</td>
+            <td>0.2059</td>
+            <td>+0.1857</td>
+            <td>0.0813</td>
+            <td>0.1329</td>
+            <td>0.6600</td>
+        </tr>
+        <tr>
+            <td>2026-02-05</td>
+            <td>🟡</td>
+            <td>0.4470</td>
+            <td>0.3886</td>
+            <td>+0.1841</td>
+            <td>0.2104</td>
+            <td>0.1129</td>
+            <td>0.6886</td>
+        </tr>
+        <tr>
+            <td>2026-02-04</td>
+            <td>🟡</td>
+            <td>0.4765</td>
+            <td>0.4047</td>
+            <td>+0.2393</td>
+            <td>0.2287</td>
+            <td>0.1076</td>
+            <td>0.6684</td>
+        </tr>
+        <tr>
+            <td>2026-02-03</td>
+            <td>🟢</td>
+            <td>0.3280</td>
+            <td>0.2838</td>
+            <td>+0.2018</td>
+            <td>0.1250</td>
+            <td>0.1082</td>
+            <td>0.6303</td>
+        </tr>
+        <tr>
+            <td>2026-02-02</td>
+            <td>🟢</td>
+            <td>0.1597</td>
+            <td>0.2899</td>
+            <td>+0.2559</td>
+            <td>0.0959</td>
+            <td>0.1034</td>
+            <td>0.6094</td>
+        </tr>
+        <tr>
+            <td>2026-01-30</td>
+            <td>🟢</td>
+            <td>0.3156</td>
+            <td>0.4567</td>
+            <td>+0.3299</td>
+            <td>0.2184</td>
+            <td>0.1058</td>
+            <td>0.5186</td>
+        </tr>
+        <tr>
+            <td>2026-01-29</td>
+            <td>🟠</td>
+            <td>0.4057</td>
+            <td>0.5666</td>
+            <td>+0.3830</td>
+            <td>0.3233</td>
+            <td>0.1047</td>
+            <td>0.4728</td>
+        </tr>
+        <tr>
+            <td>2026-01-28</td>
+            <td>🟢</td>
+            <td>0.3456</td>
+            <td>0.4813</td>
+            <td>+0.3600</td>
+            <td>0.2428</td>
+            <td>0.1054</td>
+            <td>0.4784</td>
+        </tr>
+        <tr>
+            <td>2026-01-27</td>
+            <td>🟠</td>
+            <td>0.3795</td>
+            <td>0.5191</td>
+            <td>+0.4123</td>
+            <td>0.2793</td>
+            <td>0.1055</td>
+            <td>0.4545</td>
+        </tr>
+        <tr>
+            <td>2026-01-26</td>
+            <td>🟢</td>
+            <td>0.3288</td>
+            <td>0.3955</td>
+            <td>+0.3148</td>
+            <td>0.1844</td>
+            <td>0.1051</td>
+            <td>0.4401</td>
+        </tr>
+        <tr>
+            <td>2026-01-23</td>
+            <td>🟠</td>
+            <td>0.4556</td>
+            <td>0.5640</td>
+            <td>+0.2790</td>
+            <td>0.3379</td>
+            <td>0.1049</td>
+            <td>0.4311</td>
+        </tr>
+        <tr>
+            <td>2026-01-22</td>
+            <td>🟠</td>
+            <td>0.4314</td>
+            <td>0.5884</td>
+            <td>+0.3126</td>
+            <td>0.3493</td>
+            <td>0.1070</td>
+            <td>0.3817</td>
+        </tr>
+        <tr>
+            <td>2026-01-21</td>
+            <td>🟠</td>
+            <td>0.4224</td>
+            <td>0.6084</td>
+            <td>+0.3832</td>
+            <td>0.3627</td>
+            <td>0.1095</td>
+            <td>0.4780</td>
+        </tr>
+        <tr>
+            <td>2026-01-20</td>
+            <td>🟠</td>
+            <td>0.4846</td>
+            <td>0.6214</td>
+            <td>+0.3925</td>
+            <td>0.3959</td>
+            <td>0.1057</td>
+            <td>0.7182</td>
+        </tr>
+        <tr>
+            <td>2026-01-16</td>
+            <td>🟠</td>
+            <td>0.4501</td>
+            <td>0.5306</td>
+            <td>+0.2967</td>
+            <td>0.3100</td>
+            <td>0.0850</td>
+            <td>0.7105</td>
+        </tr>
+        <tr>
+            <td>2026-01-15</td>
+            <td>🟡</td>
+            <td>0.4457</td>
+            <td>0.4396</td>
+            <td>+0.1889</td>
+            <td>0.2432</td>
+            <td>0.0857</td>
+            <td>0.6357</td>
+        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="disclaimer">
+            <strong>Aviso legal:</strong> El Sismógrafo Cuántico es un modelo experimental de investigación 
+            desarrollado como Trabajo de Fin de Grado en Física (UPV/EHU). Las señales generadas no constituyen 
+            asesoramiento financiero. La coherencia cuántica C<sub>q</sub> es un indicador estadístico derivado de la 
+            ecuación de Lindblad, no una predicción determinista. Rendimientos pasados no garantizan resultados futuros.
+        </div>
+
+        <div class="footer">
+            <p>Motor: Ecuación de Lindblad en H³ · 11 parámetros calibrados · Datos: Yahoo Finance, FRED</p>
+            <p>Código fuente: <a href="https://github.com/TUUSUARIO/sismografo-cuantico">GitHub</a></p>
+            <p>© 2026 Julen Bengoechea · Proyecto de investigación</p>
+        </div>
+    </div>
+</body>
+</html>
