@@ -8,3 +8,4 @@
 {"date": "2026-02-27", "timestamp": "2026-03-02T13:53:34.892698", "Cq": 0.127836, "Lambda": 0.075341, "Delta": -0.03193, "sigma_pred": 0.024943, "sigma_real": 0.128938, "gamma_t": 0.762147, "alerta": "CALMA", "percentil_Cq": 4}
 {"date": "2026-02-27", "timestamp": "2026-03-02T13:58:41.297896", "Cq": 0.127836, "Lambda": 0.075341, "Delta": -0.03193, "sigma_pred": 0.024943, "sigma_real": 0.128938, "gamma_t": 0.762147, "alerta": "CALMA", "percentil_Cq": 4}
 {"date": "2026-02-27", "timestamp": "2026-03-02T14:02:03.526989", "Cq": 0.127836, "Lambda": 0.075341, "Delta": -0.03193, "sigma_pred": 0.024943, "sigma_real": 0.128938, "gamma_t": 0.762147, "alerta": "CALMA", "percentil_Cq": 4}
+{"date": "2026-02-27", "timestamp": "2026-03-02T14:12:34.826983", "Cq": 0.127836, "Lambda": 0.075341, "Delta": -0.03193, "sigma_pred": 0.024943, "sigma_real": 0.128938, "gamma_t": 0.762147, "alerta": "CALMA", "percentil_Cq": 4}
