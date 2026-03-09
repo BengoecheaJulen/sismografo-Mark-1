@@ -1,0 +1,57 @@
+name: Actualización diaria Sismógrafo Cuántico
+
+on:
+  schedule:
+    - cron: '30 21 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout motor (privado)
+        uses: actions/checkout@v4
+      
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Instalar dependencias
+        run: pip install yfinance fredapi numpy pandas matplotlib requests openpyxl xlrd
+      
+      - name: Ejecutar Sismógrafo
+        run: python sismografo_vivo.py
+      
+      - name: Guardar datos en repo privado
+        run: |
+          git config user.name "Sismógrafo Bot"
+          git config user.email "bot@sismografo.local"
+          git add -A
+          FECHA=$(date +%Y-%m-%d)
+          git diff --staged --quiet || git commit -m "📊 Lectura $FECHA"
+          git push
+      
+      - name: Publicar SOLO dashboard en repo público
+        env:
+          DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
+        run: |
+          # 1. Clonar el repo público
+          git clone https://x-access-token:${DEPLOY_TOKEN}@github.com/${GITHUB_REPOSITORY_OWNER}/sismografo-cuantico.git public_repo
+          
+          # 2. Forzar limpieza y copia total de la web nueva
+          rm -rf public_repo/*.html public_repo/*.png
+          cp -rv docs/* public_repo/
+          
+          # 3. Asegurar que los datos históricos se copian al público
+          mkdir -p public_repo/data
+          cp data/registro_diario.jsonl public_repo/data/registro_diario.jsonl 2>/dev/null || true
+          
+          # 4. Enviar cambios con mensaje de control
+          cd public_repo
+          git config user.name "Sismógrafo Bot"
+          git config user.email "bot@sismografo.local"
+          git add .
+          git commit -m "🚀 MARK 1: Actualización $(date +'%Y-%m-%d')" || echo "Sin cambios"
+          git push origin main

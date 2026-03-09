@@ -1,2 +1,2 @@
-# Sismografo
-Sismógrafo- Monitorización de volatilidad financiera
+# sismografo-engine
+Motor del Sismógrafo Cuántico
