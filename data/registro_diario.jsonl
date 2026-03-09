@@ -1,3 +1,4 @@
 
 {"date": "2026-03-09", "timestamp": "2026-03-09T17:12:33.905000", "Cq": 0.12874, "Lambda": 0.058637, "Delta": 0.007987, "sigma_pred": 0.021676, "sigma_real": 0.132591, "gamma_t": 0.498558, "alerta": "CALMA", "percentil_Cq": 5}
 {"date": "2026-03-09", "timestamp": "2026-03-09T17:48:54.581024", "Cq": 0.624643, "Lambda": 0.674683, "Delta": -0.134326, "sigma_pred": 0.499723, "sigma_real": 0.133516, "gamma_t": 0.498558, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
+{"date": "2026-03-09", "timestamp": "2026-03-09T22:03:02.410282", "Cq": 0.624139, "Lambda": 0.674614, "Delta": -0.134665, "sigma_pred": 0.499447, "sigma_real": 0.135631, "gamma_t": 0.498558, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
