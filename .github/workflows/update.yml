@@ -1,4 +1,4 @@
-name: Actualización diaria Sismógrafo Cuántico
+name: Actualización diaria Sismógrafo MARK 1
 
 on:
   schedule:
@@ -10,48 +10,48 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: Checkout motor (privado)
+      - name: 1. Descargar código motor
         uses: actions/checkout@v4
       
-      - name: Configurar Python
+      - name: 2. Configurar Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       
-      - name: Instalar dependencias
+      - name: 3. Instalar dependencias
         run: pip install yfinance fredapi numpy pandas matplotlib requests openpyxl xlrd
       
-      - name: Ejecutar Sismógrafo
+      - name: 4. Ejecutar Sismógrafo
         run: python sismografo_vivo.py
       
-      - name: Guardar datos en repo privado
+      - name: 5. Guardar cambios en el motor (Privado)
         run: |
           git config user.name "Sismógrafo Bot"
           git config user.email "bot@sismografo.local"
           git add -A
           FECHA=$(date +%Y-%m-%d)
-          git diff --staged --quiet || git commit -m "📊 Lectura $FECHA"
+          git diff --staged --quiet || git commit -m "📊 Actualización motor $FECHA"
           git push
       
-      - name: Publicar SOLO dashboard en repo público
+      - name: 6. Publicar resultados en la web (Público)
         env:
           DEPLOY_TOKEN: ${{ secrets.DEPLOY_TOKEN }}
         run: |
-          # 1. Clonar el repo público
-          git clone https://x-access-token:${DEPLOY_TOKEN}@github.com/${GITHUB_REPOSITORY_OWNER}/sismografo-cuantico.git public_repo
+          # 1. Clonar el repositorio público
+          git clone https://x-access-token:${DEPLOY_TOKEN}@github.com/BengoecheaJulen/sismografo-Mark-1.git public_repo
           
-          # 2. Forzar limpieza y copia total de la web nueva
-          rm -rf public_repo/*.html public_repo/*.png
-          cp -rv docs/* public_repo/
+          # 2. Limpiar el repo público y trasplantar la web nueva
+          rm -rf public_repo/*
+          cp -rv docs/* public_repo/ 2>/dev/null || true
           
-          # 3. Asegurar que los datos históricos se copian al público
+          # 3. Crear carpeta data y mover el JSONL reconstruido
           mkdir -p public_repo/data
-          cp data/registro_diario.jsonl public_repo/data/registro_diario.jsonl 2>/dev/null || true
+          cp data/registro_diario.jsonl public_repo/data/ 2>/dev/null || true
           
-          # 4. Enviar cambios con mensaje de control
+          # 4. Subir cambios al repositorio público
           cd public_repo
           git config user.name "Sismógrafo Bot"
           git config user.email "bot@sismografo.local"
           git add .
-          git commit -m "🚀 MARK 1: Actualización $(date +'%Y-%m-%d')" || echo "Sin cambios"
+          git commit -m "🚀 MARK 1: Actualización web $(date +'%Y-%m-%d')" || echo "Sin cambios"
           git push origin main
