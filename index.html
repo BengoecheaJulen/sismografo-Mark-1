@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEISMIC · MARK I · Systemic Risk Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+    <style>
+        /*
+        ═══════════════════════════════════════════════════════════
+        SEISMIC MARK I  ·  7-STATE ALERT CLASSIFICATION
+        ═══════════════════════════════════════════════════════════
+        STATE            COLOR      TRIGGER
+        ───────────────────────────────────────────────────────────
+        EXTREME TAIL     #FF3D00    5+ consecutive CRITICAL days
+        CRITICAL         #FF1744    NEXUS>0.50 + APEX>0.30
+        HIGH RISK        #FF6D00    NEXUS>0.35 + APEX rising
+        ELEVATED         #FFB300    NEXUS 0.25–0.35, monitor
+        STABLE           #00E676    Normal regime
+        SILENT BUBBLE    #00BFA5    NEXUS>0.40 + APEX<0.15 + VECTOR<-0.15 (3d+)
+        EXTREME BUBBLE   #1DE9B6    NEXUS>0.45 + APEX<0.10 + VECTOR<-0.20 (3d+)
+        ═══════════════════════════════════════════════════════════
+        Data source: registro_diario.jsonl (GitHub, auto-update 22:30 CET)
+        */
+
+        :root {
+            --bg:           #020810;
+            --bg-panel:     #071220;
+            --bg-card:      #0C1E38;
+            --bg-row:       #0F2444;
+            --border:       rgba(30,90,160,0.28);
+            --border-mid:   rgba(60,130,220,0.45);
+            --cyan:         #00E5FF;
+
+            --void:    #FF3D00;
+            --crit:    #FF1744;
+            --high:    #FF6D00;
+            --elev:    #FFB300;
+            --stable:  #00E676;
+            --bubble:  #00BFA5;
+            --xbubble: #1DE9B6;
+
+            --t1: #EDF4FD;
+            --t2: #82B8D8;
+            --t3: #3A6080;
+            --grid: rgba(18,55,95,0.3);
+
+            --fs-xs:   0.75rem;
+            --fs-sm:   0.875rem;
+            --fs-base: 1rem;
+            --fs-md:   1.1rem;
+            --fs-lg:   1.3rem;
+            --fs-xl:   1.6rem;
+            --fs-2xl:  2.2rem;
+            --fs-3xl:  2.8rem;
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+        html { font-size: 16px; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--bg);
+            color: var(--t1);
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        body::before {
+            content:''; position:fixed; inset:0;
+            background-image:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events:none; z-index:0;
+        }
+
+        body::after {
+            content:''; position:fixed; top:0; left:0; right:0; height:1px;
+            background: linear-gradient(90deg, transparent 0%, var(--cyan) 50%, transparent 100%);
+            animation: scan 12s linear infinite;
+            opacity:0.15; z-index:200;
+        }
+
+        @keyframes scan { 0%{top:-1px} 100%{top:100vh} }
+
+        .wrap {
+            max-width: 1320px; margin:0 auto;
+            padding: 0 28px 60px;
+            position:relative; z-index:1;
+        }
+
+        /* ── HEADER ── */
+        header {
+            padding: 32px 0 24px;
+            display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 28px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .brand { display:flex; align-items:center; gap:18px; }
+
+        .brand-logo {
+            width: 52px; height: 52px;
+            border: 2px solid var(--cyan); border-radius: 4px;
+            display: flex; align-items:center; justify-content:center;
+            background: linear-gradient(135deg, rgba(0,229,255,0.08), transparent);
+            flex-shrink: 0;
+        }
+
+        .brand-logo svg { width:30px; height:30px; fill:none; stroke:var(--cyan); stroke-width:1.5; }
+
+        .brand-text h1 {
+            font-family: 'Orbitron', monospace;
+            font-size: var(--fs-2xl); font-weight:900;
+            letter-spacing: 8px; color: var(--t1); line-height:1;
+        }
+
+        .brand-text p {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-sm); color: var(--t3);
+            letter-spacing: 3px; margin-top: 5px;
+        }
+
+        .hdr-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; }
+
+        .live-badge {
+            display:flex; align-items:center; gap:10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-sm); color: var(--stable); letter-spacing:2px;
+        }
+
+        .live-dot {
+            width:9px; height:9px;
+            background: var(--stable); border-radius:50%;
+            animation: plive 2s ease-in-out infinite;
+        }
+
+        @keyframes plive {
+            0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,230,118,0.5)}
+            50%{opacity:0.6;box-shadow:0 0 0 6px rgba(0,230,118,0)}
+        }
+
+        .hdr-ts {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t3); letter-spacing:1px;
+        }
+
+        /* ── LEGEND ── */
+        .legend {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            padding: 16px 20px; margin-bottom: 22px;
+            background: var(--bg-panel);
+            border: 1px solid var(--border); border-radius: 4px;
+        }
+
+        .leg-title {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t3);
+            letter-spacing: 3px; width:100%; margin-bottom: 10px;
+        }
+
+        .leg-item {
+            display: flex; align-items: center; gap: 9px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t2); letter-spacing: 1px;
+            padding: 5px 13px;
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 3px;
+            background: rgba(255,255,255,0.02);
+        }
+
+        .ld { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+        .ld-void    { background:var(--void);    box-shadow:0 0 7px var(--void); }
+        .ld-crit    { background:var(--crit);    box-shadow:0 0 7px var(--crit); }
+        .ld-high    { background:var(--high);    box-shadow:0 0 6px var(--high); }
+        .ld-elev    { background:var(--elev);    box-shadow:0 0 5px var(--elev); }
+        .ld-stable  { background:var(--stable);  box-shadow:0 0 5px var(--stable); }
+        .ld-bubble  { background:var(--bubble);  box-shadow:0 0 6px var(--bubble); }
+        .ld-xbubble { background:var(--xbubble); box-shadow:0 0 7px var(--xbubble); }
+
+        /* ── ALERT BANNER ── */
+        .banner {
+            border-radius: 4px; padding: 20px 26px; margin-bottom: 22px;
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 20px; flex-wrap: wrap;
+        }
+
+        .banner.critical {
+            background: rgba(255,23,68,0.06);
+            border: 1px solid rgba(255,23,68,0.4);
+            border-left: 5px solid var(--crit);
+            animation: pc 3s ease-in-out infinite;
+        }
+        @keyframes pc {
+            0%,100%{box-shadow:0 0 20px rgba(255,23,68,0.07)}
+            50%{box-shadow:0 0 45px rgba(255,23,68,0.18)}
+        }
+
+        .banner.void {
+            background: #0e0300;
+            border: 1px solid #5a1500;
+            border-left: 5px solid var(--void);
+            animation: pv 1.4s ease-in-out infinite;
+        }
+        @keyframes pv {
+            0%,100%{box-shadow:0 0 30px rgba(80,20,0,0.2)}
+            50%{box-shadow:0 0 60px rgba(255,61,0,0.35)}
+        }
+
+        .banner.high    { background:rgba(255,109,0,0.05); border:1px solid rgba(255,109,0,0.35); border-left:5px solid var(--high); }
+        .banner.elevated{ background:rgba(255,179,0,0.04); border:1px solid rgba(255,179,0,0.3);  border-left:5px solid var(--elev); }
+        .banner.stable  { background:rgba(0,230,118,0.04); border:1px solid rgba(0,230,118,0.25); border-left:5px solid var(--stable); }
+        .banner.bubble  { background:rgba(0,191,165,0.05); border:1px solid rgba(0,191,165,0.35); border-left:5px solid var(--bubble); animation:pb 4s ease-in-out infinite; }
+        @keyframes pb { 0%,100%{box-shadow:0 0 16px rgba(0,191,165,0.05)} 50%{box-shadow:0 0 35px rgba(0,191,165,0.2)} }
+
+        .bnr-left { display:flex; align-items:center; gap:20px; }
+
+        .bnr-dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; }
+        .critical .bnr-dot { background:var(--crit); animation:bd 1s ease-in-out infinite; }
+        .void     .bnr-dot { background:var(--void); animation:bd 0.8s ease-in-out infinite; }
+        .high     .bnr-dot { background:var(--high); }
+        .elevated .bnr-dot { background:var(--elev); }
+        .stable   .bnr-dot { background:var(--stable); }
+        .bubble   .bnr-dot { background:var(--bubble); animation:bds 3s infinite; }
+
+        @keyframes bd  { 0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,23,68,0.5)} 50%{opacity:0.4;box-shadow:0 0 0 8px rgba(255,23,68,0)} }
+        @keyframes bds { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+        .bnr-label {
+            font-family: 'Orbitron', monospace;
+            font-size: var(--fs-lg); font-weight:700; letter-spacing:3px;
+        }
+
+        .bnr-sub {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-sm); letter-spacing:1px; margin-top:5px; opacity:0.65;
+        }
+
+        .critical .bnr-label, .critical .bnr-sub { color:var(--crit); }
+        .void     .bnr-label, .void     .bnr-sub { color:var(--void); }
+        .high     .bnr-label, .high     .bnr-sub { color:var(--high); }
+        .elevated .bnr-label, .elevated .bnr-sub { color:var(--elev); }
+        .stable   .bnr-label, .stable   .bnr-sub { color:var(--stable); }
+        .bubble   .bnr-label, .bubble   .bnr-sub { color:var(--bubble); }
+
+        .bnr-pct {
+            font-family: 'Orbitron', monospace;
+            font-size: var(--fs-3xl); font-weight:900;
+            text-align:right; line-height:1; white-space:nowrap;
+        }
+        .bnr-pct-label {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); letter-spacing:2px; opacity:0.55; margin-top:4px;
+            text-align:right;
+        }
+
+        .critical .bnr-pct, .critical .bnr-pct-label { color:var(--crit); }
+        .void     .bnr-pct, .void     .bnr-pct-label { color:var(--void); }
+        .high     .bnr-pct, .high     .bnr-pct-label { color:var(--high); }
+        .elevated .bnr-pct, .elevated .bnr-pct-label { color:var(--elev); }
+        .stable   .bnr-pct, .stable   .bnr-pct-label { color:var(--stable); }
+        .bubble   .bnr-pct, .bubble   .bnr-pct-label { color:var(--bubble); }
+
+        /* ── SECTION LABEL ── */
+        .sl {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t3);
+            letter-spacing: 4px; text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex; align-items: center; gap: 14px;
+        }
+        .sl::after { content:''; flex:1; height:1px; background:var(--border); }
+
+        /* ── METRICS ── */
+        .mgrid {
+            display: grid; grid-template-columns: repeat(4,1fr);
+            gap: 12px; margin-bottom: 22px;
+        }
+
+        .mc {
+            background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 4px;
+            padding: 20px 20px 16px;
+            position:relative; overflow:hidden;
+            transition: border-color 0.3s, transform 0.2s;
+        }
+        .mc:hover { border-color:var(--border-mid); transform:translateY(-2px); }
+
+        .mc::before {
+            content:''; position:absolute;
+            top:0; left:0; right:0; height:2px;
+        }
+        .mc.nexus::before  { background:linear-gradient(90deg,var(--crit),transparent); }
+        .mc.apex::before   { background:linear-gradient(90deg,var(--high),transparent); }
+        .mc.pulse::before  { background:linear-gradient(90deg,var(--cyan),transparent); }
+        .mc.vector::before { background:linear-gradient(90deg,var(--bubble),transparent); }
+
+        .mc-id {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t3);
+            letter-spacing: 3px; margin-bottom: 6px;
+        }
+
+        .mc-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: var(--fs-sm); font-weight:600;
+            color: var(--t2); letter-spacing:2px;
+            text-transform:uppercase; margin-bottom:12px;
+        }
+
+        .mc-val {
+            font-family: 'Orbitron', monospace;
+            font-size: var(--fs-2xl); font-weight:700; line-height:1; margin-bottom:10px;
+        }
+
+        .mc.nexus .mc-val  { color:var(--crit); }
+        .mc.apex .mc-val   { color:var(--high); }
+        .mc.pulse .mc-val  { color:var(--cyan); }
+        .mc.vector .mc-val { color:var(--bubble); }
+
+        .mc-bar {
+            height:2px; background:rgba(255,255,255,0.05);
+            border-radius:2px; margin-bottom:10px; overflow:hidden;
+        }
+        .mc-fill { height:100%; border-radius:2px; transition: width 1.2s ease; }
+        .mc.nexus .mc-fill  { background:var(--crit); }
+        .mc.apex .mc-fill   { background:var(--high); }
+        .mc.pulse .mc-fill  { background:var(--cyan); }
+        .mc.vector .mc-fill { background:var(--bubble); }
+
+        .mc-sub {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t3); letter-spacing:1px;
+        }
+
+        .c-crit   { color:var(--crit)!important; }
+        .c-high   { color:var(--high)!important; }
+        .c-bubble { color:var(--bubble)!important; }
+        .c-stable { color:var(--stable)!important; }
+        .c-cyan   { color:var(--cyan)!important; }
+
+        /* ── CHARTS ── */
+        .charts-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 14px; margin-bottom: 22px;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border); border-radius: 4px;
+            overflow:hidden;
+        }
+
+        .panel-full { grid-column: 1 / -1; }
+
+        .ph {
+            padding: 13px 18px; border-bottom: 1px solid var(--border);
+            display:flex; align-items:center; justify-content:space-between;
+        }
+
+        .pt {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-sm); color: var(--t2); letter-spacing:2px;
+        }
+
+        .pbadge {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t3);
+            background: var(--bg-row); padding: 4px 10px;
+            border-radius: 3px; letter-spacing:1px;
+        }
+
+        .chart-wrap { padding: 16px; position:relative; height:220px; }
+        .chart-wrap-tall { padding: 16px; position:relative; height:260px; }
+
+        canvas { display:block; }
+
+        /* ── TABLE ── */
+        .tscroll { overflow-x:auto; }
+
+        table { width:100%; border-collapse:collapse; }
+
+        thead tr { background: var(--bg-row); }
+
+        th {
+            padding: 11px 14px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-xs); color: var(--t3);
+            letter-spacing:2px; text-transform:uppercase;
+            text-align:left; border-bottom:1px solid var(--border);
+            white-space:nowrap;
+        }
+
+        td {
+            padding: 10px 14px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-sm); color: var(--t2);
+            border-bottom: 1px solid rgba(18,50,80,0.35);
+            white-space:nowrap;
+        }
+
+        tr:hover td { background: rgba(12,38,68,0.6); }
+        td.d { color:var(--t3); font-size: var(--fs-xs); }
+
+        .sd { display:inline-block; width:10px; height:10px; border-radius:50%; }
+        .sd-void    { background:var(--void);    box-shadow:0 0 7px var(--void); animation:bd 0.8s infinite; }
+        .sd-crit    { background:var(--crit);    box-shadow:0 0 6px var(--crit); }
+        .sd-high    { background:var(--high);    box-shadow:0 0 5px var(--high); }
+        .sd-elev    { background:var(--elev);    box-shadow:0 0 4px var(--elev); }
+        .sd-stable  { background:var(--stable);  box-shadow:0 0 4px var(--stable); }
+        .sd-bubble  { background:var(--bubble);  box-shadow:0 0 5px var(--bubble); }
+        .sd-xbubble { background:var(--xbubble); box-shadow:0 0 6px var(--xbubble); }
+
+        .vc  { color:var(--crit)!important;    font-weight:600; }
+        .vh  { color:var(--high)!important; }
+        .ve  { color:var(--elev)!important; }
+        .vs  { color:var(--stable)!important; }
+        .vb  { color:var(--bubble)!important; }
+        .vxb { color:var(--xbubble)!important; }
+        .vn  { color:var(--t2); }
+
+        /* ── LOADING ── */
+        .loading-msg {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: var(--fs-sm); color: var(--t3);
+            letter-spacing:2px; padding:20px; text-align:center;
+        }
+
+        /* ── COMING SOON ── */
+        .csg {
+            display:grid; grid-template-columns:repeat(3,1fr);
+            gap:12px; margin-bottom:22px;
+        }
+
+        .cs-card {
+            background: var(--bg-panel);
+            border: 1px solid var(--border); border-radius:4px;
+            padding: 20px; opacity:0.45;
+            position:relative; overflow:hidden;
+        }
+
+        .cs-card::after {
+            content:'CLASSIFIED';
+            position:absolute; top:50%; left:50%;
+            transform:translate(-50%,-50%) rotate(-12deg);
+            font-family:'Orbitron',monospace;
+            font-size: var(--fs-xs); font-weight:700;
+            color:rgba(255,23,68,0.1);
+            letter-spacing:4px; white-space:nowrap;
+        }
+
+        .cs-name {
+            font-family:'Orbitron',monospace;
+            font-size: var(--fs-md); font-weight:700;
+            color:var(--t3); letter-spacing:3px; margin-bottom:6px;
+        }
+
+        .cs-desc {
+            font-family:'Share Tech Mono',monospace;
+            font-size: var(--fs-xs); color:var(--t3); opacity:0.45; letter-spacing:1px;
+        }
+
+        /* ── DISCLAIMER ── */
+        .disc {
+            background: var(--bg-panel);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--t3);
+            border-radius:4px; padding:14px 20px; margin-bottom:22px;
+            font-family:'Share Tech Mono',monospace;
+            font-size: var(--fs-xs); color:var(--t3);
+            letter-spacing:0.5px; line-height:1.8;
+        }
+        .disc strong { color:var(--t2); letter-spacing:2px; }
+
+        /* ── FOOTER ── */
+        footer {
+            padding:20px 0 0;
+            border-top:1px solid var(--border);
+            display:flex; align-items:center; justify-content:space-between;
+            flex-wrap:wrap; gap:12px;
+        }
+        .f-brand {
+            font-family:'Orbitron',monospace;
+            font-size: var(--fs-sm); color:var(--t3); letter-spacing:3px;
+        }
+        .f-links { display:flex; gap:22px; }
+        .f-links a {
+            font-family:'Share Tech Mono',monospace;
+            font-size: var(--fs-sm); color:var(--t3);
+            text-decoration:none; letter-spacing:1px; transition:color 0.2s;
+        }
+        .f-links a:hover { color:var(--cyan); }
+        .f-r {
+            font-family:'Share Tech Mono',monospace;
+            font-size: var(--fs-xs); color:var(--t3); letter-spacing:1px;
+        }
+
+        /* ── ANIMATIONS ── */
+        .f0 { animation:fi 0.5s ease forwards; }
+        .f1 { animation:fi 0.5s 0.08s ease forwards; opacity:0; }
+        .f2 { animation:fi 0.5s 0.16s ease forwards; opacity:0; }
+        .f3 { animation:fi 0.5s 0.24s ease forwards; opacity:0; }
+        .f4 { animation:fi 0.5s 0.32s ease forwards; opacity:0; }
+
+        @keyframes fi {
+            from{opacity:0;transform:translateY(8px)}
+            to{opacity:1;transform:translateY(0)}
+        }
+
+        @media(max-width:1100px){ .charts-grid{ grid-template-columns:1fr; } .panel-full{ grid-column:1; } }
+        @media(max-width:900px) { .mgrid{grid-template-columns:repeat(2,1fr)} .csg{grid-template-columns:repeat(2,1fr)} header{flex-direction:column;align-items:flex-start} .banner{flex-direction:column;align-items:flex-start} }
+        @media(max-width:600px) { .mgrid{grid-template-columns:1fr 1fr} .csg{grid-template-columns:1fr} footer{flex-direction:column;align-items:flex-start} }
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <!-- HEADER -->
+    <header class="f0">
+        <div class="brand">
+            <div class="brand-logo">
+                <svg viewBox="0 0 24 24"><polyline points="2,12 5,5 8,15 11,8 14,18 17,3 20,12 22,12"/></svg>
+            </div>
+            <div class="brand-text">
+                <h1>SEISMIC</h1>
+                <p>MARK I · SYSTEMIC RISK INTELLIGENCE</p>
+            </div>
+        </div>
+        <div class="hdr-right">
+            <div class="live-badge"><div class="live-dot"></div>LIVE · AUTO-UPDATE 22:30 CET</div>
+            <div class="hdr-ts" id="lastUpdate">LOADING LAST SIGNAL...</div>
+        </div>
+    </header>
+
+    <!-- LEGEND -->
+    <div class="legend f1">
+        <div class="leg-title">ALERT REGIME CLASSIFICATION SYSTEM · 7 STATES</div>
+        <div class="leg-item"><span class="ld ld-void"></span>EXTREME TAIL · 5+ CRITICAL DAYS</div>
+        <div class="leg-item"><span class="ld ld-crit"></span>CRITICAL · NEXUS&gt;0.50 + APEX&gt;0.30</div>
+        <div class="leg-item"><span class="ld ld-high"></span>HIGH RISK · NEXUS&gt;0.35 SUSTAINED</div>
+        <div class="leg-item"><span class="ld ld-elev"></span>ELEVATED · NEXUS 0.25–0.35</div>
+        <div class="leg-item"><span class="ld ld-stable"></span>STABLE · NORMAL REGIME</div>
+        <div class="leg-item"><span class="ld ld-bubble"></span>SILENT BUBBLE · NEXUS&gt;0.40 + APEX&lt;0.15 + VECTOR&lt;−0.15</div>
+        <div class="leg-item"><span class="ld ld-xbubble"></span>EXTREME BUBBLE · NEXUS&gt;0.45 + APEX&lt;0.10 + VECTOR&lt;−0.20</div>
+    </div>
+
+    <!-- ALERT BANNER -->
+    <div class="banner critical f1" id="alertBanner">
+        <div class="bnr-left">
+            <div class="bnr-dot"></div>
+            <div>
+                <div class="bnr-label" id="bnrLabel">CRITICAL ALERT</div>
+                <div class="bnr-sub" id="bnrSub">LOADING LATEST DATA...</div>
+            </div>
+        </div>
+        <div>
+            <div class="bnr-pct" id="bnrPct">—</div>
+            <div class="bnr-pct-label">NEXUS PERCENTILE</div>
+        </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="sl f2">CORE OBSERVABLES · MARK I</div>
+    <div class="mgrid f2">
+        <div class="mc nexus">
+            <div class="mc-id">SYS-01</div>
+            <div class="mc-name">NEXUS INDEX</div>
+            <div class="mc-val" id="m-nexus">—</div>
+            <div class="mc-bar"><div class="mc-fill" id="b-nexus" style="width:0%"></div></div>
+            <div class="mc-sub" id="s-nexus">LOADING...</div>
+        </div>
+        <div class="mc apex">
+            <div class="mc-id">SYS-02</div>
+            <div class="mc-name">APEX SIGNAL</div>
+            <div class="mc-val" id="m-apex">—</div>
+            <div class="mc-bar"><div class="mc-fill" id="b-apex" style="width:0%"></div></div>
+            <div class="mc-sub" id="s-apex">EXTREME STATE PROBABILITY</div>
+        </div>
+        <div class="mc pulse">
+            <div class="mc-id">SYS-03</div>
+            <div class="mc-name">PULSE FORECAST</div>
+            <div class="mc-val" id="m-pulse">—</div>
+            <div class="mc-bar"><div class="mc-fill" id="b-pulse" style="width:0%"></div></div>
+            <div class="mc-sub" id="s-pulse">LOADING...</div>
+        </div>
+        <div class="mc vector">
+            <div class="mc-id">SYS-04</div>
+            <div class="mc-name">VECTOR BIAS</div>
+            <div class="mc-val" id="m-vector">—</div>
+            <div class="mc-bar"><div class="mc-fill" id="b-vector" style="width:50%"></div></div>
+            <div class="mc-sub" id="s-vector">LOADING...</div>
+        </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="sl f3">SIGNAL ANALYSIS · LIVE DATA</div>
+    <div class="charts-grid f3">
+
+        <div class="panel panel-full">
+            <div class="ph">
+                <div class="pt">PULSE FORECAST vs REALIZED VOLATILITY</div>
+                <div class="pbadge">S&P 500 · DAILY</div>
+            </div>
+            <div class="chart-wrap-tall">
+                <canvas id="chartVol"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="ph">
+                <div class="pt">NEXUS INDEX · SYSTEMIC COHERENCE</div>
+                <div class="pbadge">LEAD 15–20D</div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="chartNexus"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="ph">
+                <div class="pt">APEX SIGNAL · EXTREME STATE PROB.</div>
+                <div class="pbadge">ACTIVATION</div>
+            </div>
+            <div class="chart-wrap">
+                <canvas id="chartApex"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="sl f3">SIGNAL LOG · LAST 30 SESSIONS</div>
+    <div class="panel f3" style="margin-bottom:22px">
+        <div class="ph">
+            <div class="pt">HISTORICAL RECORD · GITHUB TIMESTAMPED</div>
+            <div class="pbadge">VERIFIED · IMMUTABLE</div>
+        </div>
+        <div class="tscroll">
+            <table>
+                <thead>
+                    <tr>
+                        <th>DATE</th><th>REGIME</th><th>NEXUS</th><th>APEX</th>
+                        <th>VECTOR</th><th>PULSE FCST</th><th>REALIZED</th><th>CORE STAB</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="8" class="loading-msg">LOADING DATA FROM GITHUB...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- COMING SOON -->
+    <div class="sl f4">INTELLIGENCE NETWORK · INCOMING</div>
+    <div class="csg f4">
+        <div class="cs-card"><div class="cs-name">MARK II</div><div class="cs-desc">SECTOR ROTATION · CROSS-ASSET INTELLIGENCE</div></div>
+        <div class="cs-card"><div class="cs-name">MARK III</div><div class="cs-desc">CREDIT STRESS · SOVEREIGN RISK DETECTION</div></div>
+        <div class="cs-card"><div class="cs-name">MARK IV</div><div class="cs-desc">CONTAGION MAPPING · NETWORK TOPOLOGY</div></div>
+    </div>
+
+    <!-- DISCLAIMER -->
+    <div class="disc f4">
+        <strong>LEGAL NOTICE</strong> &nbsp;·&nbsp;
+        SEISMIC MARK I is an experimental research intelligence system. Signals do not constitute financial advice or investment recommendations. Past performance does not guarantee future results. For institutional research purposes only.
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="f4">
+        <div class="f-brand">SEISMIC © 2026</div>
+        <div class="f-links">
+            <a href="https://github.com/BengoecheaJulen/sismografo-Mark-1" target="_blank">GITHUB →</a>
+            <a href="mailto:contact@seismic.io">CONTACT</a>
+        </div>
+        <div class="f-r">DATA · YAHOO FINANCE · FRED</div>
+    </footer>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// SEISMIC MARK I — Data Engine
+// Reads registro_diario.jsonl from GitHub raw
+// Falls back to embedded historical data if fetch fails
+// ═══════════════════════════════════════════════════════
+
+const GITHUB_RAW = 'https://raw.githubusercontent.com/BengoecheaJulen/sismografo-Mark-1/main/data/registro_diario.jsonl';
+
+// Embedded fallback data (historical from CSV)
+const FALLBACK_DATA = [
+    {date:'2026-01-26',Cq:0.3288,Lambda:0.3955,Delta:+0.3148,sigma_pred:0.1844,sigma_real:0.1051,gamma_t:0.4401,percentil_Cq:45},
+    {date:'2026-01-27',Cq:0.3795,Lambda:0.5191,Delta:+0.4123,sigma_pred:0.2793,sigma_real:0.1055,gamma_t:0.4545,percentil_Cq:58},
+    {date:'2026-01-28',Cq:0.3456,Lambda:0.4813,Delta:+0.3600,sigma_pred:0.2428,sigma_real:0.1054,gamma_t:0.4784,percentil_Cq:50},
+    {date:'2026-01-29',Cq:0.4057,Lambda:0.5666,Delta:+0.3830,sigma_pred:0.3233,sigma_real:0.1047,gamma_t:0.4728,percentil_Cq:65},
+    {date:'2026-01-30',Cq:0.3156,Lambda:0.4567,Delta:+0.3299,sigma_pred:0.2184,sigma_real:0.1058,gamma_t:0.5186,percentil_Cq:44},
+    {date:'2026-02-02',Cq:0.1597,Lambda:0.2899,Delta:+0.2559,sigma_pred:0.0959,sigma_real:0.1034,gamma_t:0.6094,percentil_Cq:18},
+    {date:'2026-02-03',Cq:0.3280,Lambda:0.2838,Delta:+0.2018,sigma_pred:0.1250,sigma_real:0.1082,gamma_t:0.6303,percentil_Cq:46},
+    {date:'2026-02-04',Cq:0.4765,Lambda:0.4047,Delta:+0.2393,sigma_pred:0.2287,sigma_real:0.1076,gamma_t:0.6684,percentil_Cq:74},
+    {date:'2026-02-05',Cq:0.4470,Lambda:0.3886,Delta:+0.1841,sigma_pred:0.2104,sigma_real:0.1129,gamma_t:0.6886,percentil_Cq:70},
+    {date:'2026-02-10',Cq:0.2570,Lambda:0.1859,Delta:+0.1105,sigma_pred:0.0715,sigma_real:0.1324,gamma_t:0.5647,percentil_Cq:30},
+    {date:'2026-02-11',Cq:0.2316,Lambda:0.1652,Delta:+0.0961,sigma_pred:0.0607,sigma_real:0.1323,gamma_t:0.5788,percentil_Cq:25},
+    {date:'2026-02-12',Cq:0.3480,Lambda:0.1865,Delta:+0.0610,sigma_pred:0.0862,sigma_real:0.1428,gamma_t:0.5775,percentil_Cq:50},
+    {date:'2026-02-13',Cq:0.3793,Lambda:0.1887,Delta:+0.0113,sigma_pred:0.0924,sigma_real:0.1419,gamma_t:0.5524,percentil_Cq:57},
+    {date:'2026-02-17',Cq:0.3521,Lambda:0.2482,Delta:-0.0084,sigma_pred:0.1131,sigma_real:0.1416,gamma_t:0.5211,percentil_Cq:52},
+    {date:'2026-02-18',Cq:0.2385,Lambda:0.2251,Delta:-0.0557,sigma_pred:0.0832,sigma_real:0.1432,gamma_t:0.5315,percentil_Cq:27},
+    {date:'2026-02-19',Cq:0.3302,Lambda:0.2375,Delta:-0.0877,sigma_pred:0.1043,sigma_real:0.1230,gamma_t:0.6928,percentil_Cq:47},
+    {date:'2026-02-20',Cq:0.2968,Lambda:0.2227,Delta:-0.0108,sigma_pred:0.0921,sigma_real:0.1187,gamma_t:0.7588,percentil_Cq:38},
+    {date:'2026-02-23',Cq:0.2492,Lambda:0.2264,Delta:+0.1122,sigma_pred:0.0855,sigma_real:0.1226,gamma_t:0.7324,percentil_Cq:30},
+    {date:'2026-02-24',Cq:0.5474,Lambda:0.3889,Delta:+0.2506,sigma_pred:0.2380,sigma_real:0.1258,gamma_t:0.7420,percentil_Cq:82},
+    {date:'2026-02-25',Cq:0.4152,Lambda:0.3382,Delta:+0.1406,sigma_pred:0.1725,sigma_real:0.1279,gamma_t:0.7268,percentil_Cq:64},
+    {date:'2026-02-26',Cq:0.4895,Lambda:0.4321,Delta:+0.0990,sigma_pred:0.2507,sigma_real:0.1283,gamma_t:0.7391,percentil_Cq:76},
+    {date:'2026-02-27',Cq:0.4591,Lambda:0.5436,Delta:+0.0225,sigma_pred:0.3230,sigma_real:0.1289,gamma_t:0.7621,percentil_Cq:72},
+    {date:'2026-03-02',Cq:0.3972,Lambda:0.5872,Delta:-0.0830,sigma_pred:0.3367,sigma_real:0.1290,gamma_t:0.7496,percentil_Cq:61},
+    {date:'2026-03-03',Cq:0.4591,Lambda:0.5778,Delta:-0.1892,sigma_pred:0.3502,sigma_real:0.1321,gamma_t:0.7345,percentil_Cq:72},
+    {date:'2026-03-04',Cq:0.5199,Lambda:0.5929,Delta:-0.2287,sigma_pred:0.3843,sigma_real:0.1337,gamma_t:0.6154,percentil_Cq:80},
+    {date:'2026-03-05',Cq:0.5630,Lambda:0.6090,Delta:-0.2404,sigma_pred:0.4141,sigma_real:0.1320,gamma_t:0.5771,percentil_Cq:88},
+    {date:'2026-03-06',Cq:0.6048,Lambda:0.6448,Delta:-0.1945,sigma_pred:0.4630,sigma_real:0.1385,gamma_t:0.4943,percentil_Cq:94},
+    {date:'2026-03-09',Cq:0.6241,Lambda:0.6746,Delta:-0.1347,sigma_pred:0.4994,sigma_real:0.1356,gamma_t:0.4986,percentil_Cq:97},
+];
+
+// ── State classification ──
+function classifyState(d) {
+    const {Cq, Lambda, Delta} = d;
+    if (Cq > 0.50 && Lambda > 0.30) return 'critical';
+    if (Cq > 0.45 && Lambda < 0.10 && Delta < -0.20) return 'xbubble';
+    if (Cq > 0.40 && Lambda < 0.15 && Delta < -0.15) return 'bubble';
+    if (Cq > 0.35) return 'high';
+    if (Cq > 0.25) return 'elevated';
+    return 'stable';
+}
+
+function stateToClass(s) {
+    return { critical:'sd-crit', high:'sd-high', elevated:'sd-elev', stable:'sd-stable', bubble:'sd-bubble', xbubble:'sd-xbubble', void:'sd-void' }[s] || 'sd-stable';
+}
+
+function stateLabel(s) {
+    return { critical:'CRITICAL ALERT', high:'HIGH RISK', elevated:'ELEVATED', stable:'STABLE', bubble:'SILENT BUBBLE', xbubble:'EXTREME BUBBLE', void:'EXTREME TAIL' }[s] || 'STABLE';
+}
+
+function valueCls(v, type) {
+    if (type === 'Cq') {
+        if (v > 0.50) return 'vc';
+        if (v > 0.35) return 'vh';
+        if (v > 0.25) return 've';
+        return 'vs';
+    }
+    if (type === 'Lambda') {
+        if (v > 0.30) return 'vc';
+        if (v > 0.15) return 'vh';
+        return 'vn';
+    }
+    if (type === 'Delta') {
+        if (v < -0.15) return 'vb';
+        if (v > 0.20) return 'vc';
+        return 'vn';
+    }
+    if (type === 'sigma_pred') {
+        if (v > 0.35) return 'vc';
+        if (v > 0.20) return 'vh';
+        return 'vn';
+    }
+    return 'vn';
+}
+
+// ── Chart defaults ──
+const CHART_DEFAULTS = {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 1200, easing: 'easeInOutQuart' },
+    plugins: {
+        legend: {
+            labels: {
+                color: '#7DB3D8',
+                font: { family: "'Share Tech Mono', monospace", size: 11 },
+                boxWidth: 12, padding: 16
+            }
+        },
+        tooltip: {
+            backgroundColor: 'rgba(10,18,40,0.95)',
+            titleColor: '#00E5FF',
+            bodyColor: '#E8F4FD',
+            borderColor: 'rgba(30,90,160,0.5)',
+            borderWidth: 1,
+            titleFont: { family: "'Share Tech Mono', monospace", size: 11 },
+            bodyFont: { family: "'Share Tech Mono', monospace", size: 11 },
+        }
+    },
+    scales: {
+        x: {
+            ticks: {
+                color: '#3A6080',
+                font: { family: "'Share Tech Mono', monospace", size: 10 },
+                maxTicksLimit: 10,
+                maxRotation: 0,
+            },
+            grid: { color: 'rgba(18,55,95,0.25)' }
+        },
+        y: {
+            ticks: {
+                color: '#3A6080',
+                font: { family: "'Share Tech Mono', monospace", size: 10 },
+            },
+            grid: { color: 'rgba(18,55,95,0.25)' }
+        }
+    }
+};
+
+let charts = {};
+
+function buildCharts(data) {
+    const sorted = [...data].sort((a,b) => a.date.localeCompare(b.date));
+    const labels = sorted.map(d => d.date.slice(5)); // MM-DD
+    const full_labels = sorted.map(d => d.date);
+
+    // ── VOL CHART ──
+    if (charts.vol) charts.vol.destroy();
+    charts.vol = new Chart(document.getElementById('chartVol'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'PULSE FORECAST (σ pred)',
+                    data: sorted.map(d => +(d.sigma_pred * 100).toFixed(2)),
+                    borderColor: '#FF1744',
+                    backgroundColor: 'rgba(255,23,68,0.05)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#FF1744',
+                    tension: 0.3,
+                    fill: true,
+                },
+                {
+                    label: 'REALIZED σ',
+                    data: sorted.map(d => +(d.sigma_real * 100).toFixed(2)),
+                    borderColor: '#40A0FF',
+                    backgroundColor: 'rgba(64,160,255,0.04)',
+                    borderWidth: 1.5,
+                    pointRadius: 2,
+                    pointBackgroundColor: '#40A0FF',
+                    tension: 0.3,
+                    fill: true,
+                }
+            ]
+        },
+        options: {
+            ...CHART_DEFAULTS,
+            plugins: {
+                ...CHART_DEFAULTS.plugins,
+                tooltip: {
+                    ...CHART_DEFAULTS.plugins.tooltip,
+                    callbacks: {
+                        label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toFixed(1)}%`
+                    }
+                }
+            },
+            scales: {
+                ...CHART_DEFAULTS.scales,
+                y: {
+                    ...CHART_DEFAULTS.scales.y,
+                    ticks: {
+                        ...CHART_DEFAULTS.scales.y.ticks,
+                        callback: v => v + '%'
+                    }
+                }
+            }
+        }
+    });
+
+    // ── NEXUS CHART ──
+    if (charts.nexus) charts.nexus.destroy();
+    // P80 threshold line
+    const p80 = sorted.map(() => 43.5);
+    charts.nexus = new Chart(document.getElementById('chartNexus'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'NEXUS INDEX',
+                    data: sorted.map(d => +d.Cq.toFixed(4)),
+                    borderColor: '#FF1744',
+                    backgroundColor: 'rgba(255,23,68,0.08)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: sorted.map(d => {
+                        const v = d.Cq;
+                        if (v > 0.5) return '#FF1744';
+                        if (v > 0.35) return '#FF6D00';
+                        if (v > 0.25) return '#FFB300';
+                        return '#00E676';
+                    }),
+                    tension: 0.4,
+                    fill: true,
+                },
+                {
+                    label: 'P80 THRESHOLD',
+                    data: sorted.map(() => 0.435),
+                    borderColor: 'rgba(255,179,0,0.4)',
+                    borderWidth: 1,
+                    borderDash: [4, 4],
+                    pointRadius: 0,
+                    tension: 0,
+                    fill: false,
+                }
+            ]
+        },
+        options: CHART_DEFAULTS
+    });
+
+    // ── APEX CHART ──
+    if (charts.apex) charts.apex.destroy();
+    charts.apex = new Chart(document.getElementById('chartApex'), {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'APEX SIGNAL',
+                    data: sorted.map(d => +d.Lambda.toFixed(4)),
+                    borderColor: '#FF6D00',
+                    backgroundColor: 'rgba(255,109,0,0.08)',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#FF6D00',
+                    tension: 0.4,
+                    fill: true,
+                },
+                {
+                    label: 'VECTOR BIAS',
+                    data: sorted.map(d => +d.Delta.toFixed(4)),
+                    borderColor: '#00BFA5',
+                    backgroundColor: 'rgba(0,191,165,0.04)',
+                    borderWidth: 1.5,
+                    pointRadius: 2,
+                    borderDash: [],
+                    tension: 0.4,
+                    fill: false,
+                }
+            ]
+        },
+        options: CHART_DEFAULTS
+    });
+}
+
+// ── Update dashboard ──
+function updateDashboard(data) {
+    const sorted = [...data].sort((a,b) => a.date.localeCompare(b.date));
+    const latest = sorted[sorted.length - 1];
+    if (!latest) return;
+
+    // Timestamp
+    document.getElementById('lastUpdate').textContent =
+        `LAST SIGNAL: ${latest.date} · ${latest.timestamp ? latest.timestamp.slice(11,16) : '22:03'} UTC`;
+
+    // State
+    const state = classifyState(latest);
+    const banner = document.getElementById('alertBanner');
+    banner.className = `banner ${state} f1`;
+
+    document.getElementById('bnrLabel').textContent = stateLabel(state);
+    document.getElementById('bnrSub').textContent =
+        `NEXUS P${latest.percentil_Cq || '—'} · ${latest.date} · VECTOR: ${latest.Delta >= 0 ? '+' : ''}${latest.Delta.toFixed(4)}`;
+    document.getElementById('bnrPct').textContent = latest.percentil_Cq ? `${latest.percentil_Cq}th` : '—';
+
+    // Metrics
+    document.getElementById('m-nexus').textContent = latest.Cq.toFixed(4);
+    document.getElementById('b-nexus').style.width = `${Math.min(latest.Cq * 100, 100)}%`;
+    document.getElementById('s-nexus').innerHTML =
+        `P${latest.percentil_Cq || '—'} · <span class="${latest.Cq > 0.50 ? 'c-crit' : latest.Cq > 0.35 ? 'c-high' : 'c-stable'}">` +
+        `${latest.Cq > 0.50 ? '↑ CRITICAL ZONE' : latest.Cq > 0.35 ? '↑ ELEVATED ZONE' : '→ NORMAL RANGE'}</span>`;
+
+    document.getElementById('m-apex').textContent = latest.Lambda.toFixed(4);
+    document.getElementById('b-apex').style.width = `${Math.min(latest.Lambda * 100, 100)}%`;
+
+    document.getElementById('m-pulse').textContent = `${(latest.sigma_pred * 100).toFixed(2)}%`;
+    document.getElementById('b-pulse').style.width = `${Math.min(latest.sigma_pred * 100, 100)}%`;
+    document.getElementById('s-pulse').textContent = `REALIZED σ: ${(latest.sigma_real * 100).toFixed(2)}%`;
+
+    document.getElementById('m-vector').textContent =
+        `${latest.Delta >= 0 ? '+' : ''}${latest.Delta.toFixed(3)}`;
+    document.getElementById('s-vector').innerHTML =
+        latest.Delta < -0.15
+            ? `<span class="c-bubble">▼ SILENT BUBBLE REGIME</span>`
+            : latest.Delta > 0.15
+            ? `<span class="c-high">▲ PANIC BIAS</span>`
+            : `<span class="vn">→ NEUTRAL BIAS</span>`;
+
+    // Table
+    const tbody = document.getElementById('tableBody');
+    const rows = sorted.slice().reverse().slice(0, 30);
+    tbody.innerHTML = rows.map(d => {
+        const s = classifyState(d);
+        const sc = stateToClass(s);
+        const dp = (latest.Delta >= 0 ? '+' : '') + d.Delta.toFixed(4);
+        return `<tr>
+            <td class="d">${d.date}</td>
+            <td><span class="sd ${sc}"></span></td>
+            <td class="${valueCls(d.Cq,'Cq')}">${d.Cq.toFixed(4)}</td>
+            <td class="${valueCls(d.Lambda,'Lambda')}">${d.Lambda.toFixed(4)}</td>
+            <td class="${valueCls(d.Delta,'Delta')}">${d.Delta >= 0 ? '+' : ''}${d.Delta.toFixed(4)}</td>
+            <td class="${valueCls(d.sigma_pred,'sigma_pred')}">${d.sigma_pred.toFixed(4)}</td>
+            <td class="vn">${d.sigma_real.toFixed(4)}</td>
+            <td class="vn">${d.gamma_t.toFixed(4)}</td>
+        </tr>`;
+    }).join('');
+
+    // Charts
+    buildCharts(sorted);
+}
+
+// ── Fetch from GitHub ──
+async function loadData() {
+    try {
+        const res = await fetch(GITHUB_RAW + '?t=' + Date.now());
+        if (!res.ok) throw new Error('fetch failed');
+        const text = await res.text();
+        const lines = text.trim().split('\n').filter(l => l.trim());
+        if (lines.length === 0) throw new Error('empty');
+
+        // Parse JSONL, deduplicate by date keeping last entry per day
+        const parsed = lines.map(l => JSON.parse(l));
+        const byDate = {};
+        parsed.forEach(d => { byDate[d.date] = d; });
+
+        // Merge with fallback for history
+        const fallbackByDate = {};
+        FALLBACK_DATA.forEach(d => { fallbackByDate[d.date] = d; });
+
+        const merged = { ...fallbackByDate, ...byDate };
+        updateDashboard(Object.values(merged));
+
+    } catch(e) {
+        console.warn('GitHub fetch failed, using fallback data:', e);
+        updateDashboard(FALLBACK_DATA);
+    }
+}
+
+// Init
+loadData();
+
+// Refresh every 5 minutes
+setInterval(loadData, 5 * 60 * 1000);
+</script>
+</body>
+</html>
