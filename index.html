@@ -10,57 +10,56 @@
     <style>
         :root {
             --bg: #020810; --bg-panel: #071220; --bg-card: #0C1E38; --bg-row: #0F2444;
-            --border: rgba(30,90,160,0.28); --border-mid: rgba(60,130,220,0.45); --cyan: #00E5FF;
-            --void: #9C27B0; --crit: #FF1744; --high: #FF3D00; --elev: #FFB300; --stable: #00E676; --bubble: #00B0FF; --xbubble: #E040FB;
-            --t1: #EDF4FD; --t2: #82B8D8; --t3: #3A6080; --grid: rgba(18,55,95,0.3);
+            --border: rgba(30,90,160,0.28); --cyan: #00E5FF;
+            --crit: #FF1744; --high: #FF6D00; --elev: #FFB300; --stable: #00E676; --bubble: #00B0FF;
+            --t1: #EDF4FD; --t2: #82B8D8; --t3: #3A6080;
         }
-        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family: 'Rajdhani', sans-serif; background: var(--bg); color: var(--t1); min-height: 100vh; line-height: 1.5; position:relative; }
-        body::before { content:''; position:fixed; inset:0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 48px 48px; pointer-events:none; z-index:0; }
-        .wrap { max-width: 1320px; margin:0 auto; padding: 0 28px 60px; position:relative; z-index:1; }
-        header { padding: 32px 0 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
-        .brand-text h1 { font-family: 'Orbitron', monospace; font-size: 2.2rem; font-weight:900; letter-spacing: 8px; line-height:1; }
+        body { font-family: 'Rajdhani', sans-serif; background: var(--bg); color: var(--t1); margin:0; padding: 20px; line-height: 1.5; }
+        .wrap { max-width: 1300px; margin: 0 auto; }
+        header { border-bottom: 1px solid var(--border); padding-bottom: 20px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .brand h1 { font-family: 'Orbitron', sans-serif; letter-spacing: 5px; margin: 0; color: var(--cyan); }
         .banner { border-radius: 4px; padding: 20px 26px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
-        .bnr-pct { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight:900; line-height:1; }
-        .mgrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
-        .mc { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 4px; }
-        .mc-val { font-family: 'Orbitron', monospace; font-size: 2.2rem; font-weight:700; line-height:1; margin-bottom:10px; }
-        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
-        .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; overflow:hidden; }
-        .chart-wrap { padding: 16px; height:220px; position:relative; }
-        table { width:100%; border-collapse:collapse; }
-        th { padding: 11px 10px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--t3); text-align:center; background: var(--bg-row); border-bottom:1px solid var(--border); }
-        td { padding: 10px; border-bottom: 1px solid rgba(18,50,80,0.35); font-family: 'Share Tech Mono', monospace; text-align:center; color: var(--t2); }
+        .bnr-pct { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight:900; }
+        .mgrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0; }
+        .mc { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 4px; }
+        .mc-name { color: var(--t3); font-size: 0.8rem; font-family: 'Orbitron'; }
+        .mc-val { font-size: 1.8rem; font-weight: 700; font-family: 'Share Tech Mono'; margin-top: 5px; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .panel { background: var(--bg-card); border: 1px solid var(--border); padding: 15px; border-radius: 4px; }
+        canvas { width: 100% !important; height: 260px !important; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: var(--bg-row); color: var(--t3); padding: 10px; font-size: 0.8rem; }
+        td { padding: 8px; border-bottom: 1px solid var(--border); font-family: 'Share Tech Mono'; text-align: center; }
     </style>
 </head>
 <body>
 <div class="wrap">
     <header>
-        <div class="brand"><div class="brand-text"><h1>SEISMIC</h1><p>MARK I · SYSTEMIC RISK INTELLIGENCE</p></div></div>
-        <div id="lastUpdate" style="font-family:'Share Tech Mono'; color:var(--t3)">LOADING...</div>
+        <div class="brand"><h1>SEISMIC</h1><p>MARK I · SYSTEMIC RISK INTELLIGENCE</p></div>
+        <div id="lastUpdate" style="font-family:'Share Tech Mono'; color:var(--t3)">CONECTANDO...</div>
     </header>
 
-    <div class="banner sync" id="alertBanner">
-        <div><div id="bnrLabel" style="font-family:'Orbitron'; font-size:1.5rem; font-weight:700;">INITIALIZING</div><div id="bnrSub" style="font-family:'Share Tech Mono'; opacity:0.6;">SYNCING DATA...</div></div>
+    <div class="banner" id="alertBanner">
+        <div><div id="bnrLabel" style="font-family:'Orbitron'; font-size:1.5rem; font-weight:700;">SISTEMA ACTIVO</div><div id="bnrSub" style="font-family:'Share Tech Mono'; opacity:0.6;">SYNCING DATA...</div></div>
         <div style="text-align:right;"><div class="bnr-pct" id="bnrPct">—</div><div style="font-family:'Share Tech Mono'; font-size:0.7rem; opacity:0.5;">PERCENTILE</div></div>
     </div>
 
     <div class="mgrid">
-        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">NEXUS</div><div class="mc-val" id="m-nexus">—</div></div>
-        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">APEX</div><div class="mc-val" id="m-apex">—</div></div>
-        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">PULSE</div><div class="mc-val" id="m-pulse">—</div></div>
-        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">VECTOR</div><div class="mc-val" id="m-vector">—</div></div>
+        <div class="mc"><div class="mc-name">NEXUS (Cq)</div><div class="mc-val" id="m-nexus">—</div></div>
+        <div class="mc"><div class="mc-name">APEX (Lambda)</div><div class="mc-val" id="m-apex">—</div></div>
+        <div class="mc"><div class="mc-name">VECTOR (Delta)</div><div class="mc-val" id="m-vector">—</div></div>
+        <div class="mc"><div class="mc-name">PULSE (Sigma)</div><div class="mc-val" id="m-pulse">—</div></div>
     </div>
 
     <div class="charts-grid">
-        <div class="panel" style="grid-column: 1 / -1;"><div class="chart-wrap" style="height:260px;"><canvas id="chartVol"></canvas></div></div>
-        <div class="panel"><div class="chart-wrap"><canvas id="chartNexus"></canvas></div></div>
-        <div class="panel"><div class="chart-wrap"><canvas id="chartApex"></canvas></div></div>
+        <div class="panel" style="grid-column: 1 / -1;"><canvas id="chartVol"></canvas></div>
+        <div class="panel"><canvas id="chartNexus"></canvas></div>
+        <div class="panel"><canvas id="chartApex"></canvas></div>
     </div>
 
-    <div class="panel" style="overflow-x:auto;">
+    <div class="panel" style="margin-top:20px; overflow-x:auto;">
         <table>
-            <thead><tr><th>DATE</th><th>NEXUS</th><th>APEX</th><th>VECTOR</th><th>PULSE</th><th>REALIZED</th></tr></thead>
+            <thead><tr><th>DATE</th><th>NEXUS</th><th>APEX</th><th>VECTOR</th><th>PULSE</th><th>REAL</th></tr></thead>
             <tbody id="tableBody"></tbody>
         </table>
     </div>
@@ -69,40 +68,43 @@
 <script>
     const GITHUB_RAW = 'https://raw.githubusercontent.com/BengoecheaJulen/sismografo-MARK-1-engine/main/data/registro_diario.jsonl';
 
-    async function loadData() {
+    async function init() {
         try {
             const res = await fetch(GITHUB_RAW + '?t=' + Date.now());
             const text = await res.text();
-            const rows = text.trim().split('\n').map(JSON.parse);
-            const latest = rows[rows.length - 1];
-            
-            // Lógica de estados para el banner
-            const cq = latest.Cq;
-            const banner = document.getElementById('alertBanner');
-            if (cq > 0.56) { banner.className = 'banner critical'; document.getElementById('bnrLabel').textContent = 'CRITICAL ALERT'; }
-            else if (cq > 0.49) { banner.className = 'banner high'; document.getElementById('bnrLabel').textContent = 'HIGH RISK'; }
-            else { banner.className = 'banner stable'; document.getElementById('bnrLabel').textContent = 'STABLE REGIME'; }
+            const data = text.trim().split('\n').map(JSON.parse);
+            const recent = data.slice(-60);
+            const latest = data[data.length - 1];
 
             document.getElementById('m-nexus').textContent = latest.Cq.toFixed(4);
             document.getElementById('m-apex').textContent = latest.Lambda.toFixed(4);
-            document.getElementById('m-pulse').textContent = (latest.sigma_pred * 100).toFixed(1) + '%';
             document.getElementById('m-vector').textContent = (latest.Delta >= 0 ? '+' : '') + latest.Delta.toFixed(3);
+            document.getElementById('m-pulse').textContent = (latest.sigma_pred * 100).toFixed(1) + '%';
             document.getElementById('bnrPct').textContent = 'P' + Math.round(latest.percentil_Cq || 0);
-            document.getElementById('lastUpdate').textContent = 'LAST SIGNAL: ' + latest.date;
-            
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = rows.slice(-20).reverse().map(r => `
+            document.getElementById('lastUpdate').textContent = 'SIGNAL: ' + latest.date;
+
+            const labels = recent.map(d => d.date);
+            const commonOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } } };
+
+            new Chart(document.getElementById('chartNexus'), { type: 'line', data: { labels, datasets: [{ data: recent.map(r => r.Cq), borderColor: '#00E5FF', borderWidth: 2, pointRadius: 0, tension: 0.2 }] }, options: commonOpts });
+            new Chart(document.getElementById('chartApex'), { type: 'line', data: { labels, datasets: [{ data: recent.map(r => r.Lambda), borderColor: '#FFB300', borderWidth: 2, pointRadius: 0, tension: 0.2 }] }, options: commonOpts });
+            new Chart(document.getElementById('chartVol'), { type: 'line', data: { labels, datasets: [
+                { label: 'Predicha', data: recent.map(r => r.sigma_pred), borderColor: '#FF1744', borderDash: [5,5], borderWidth: 1, pointRadius: 0 },
+                { label: 'Real', data: recent.map(r => r.sigma_real), borderColor: '#00E676', borderWidth: 2, pointRadius: 0 }
+            ]}, options: { ...commonOpts, plugins: { legend: { display: true, labels: { color: '#EDF4FD' } } } } });
+
+            document.getElementById('tableBody').innerHTML = data.slice(-15).reverse().map(r => `
                 <tr>
                     <td>${r.date}</td>
                     <td>${r.Cq.toFixed(4)}</td>
                     <td>${r.Lambda.toFixed(4)}</td>
-                    <td>${(r.Delta >= 0 ? '+' : '') + r.Delta.toFixed(4)}</td>
+                    <td style="color:${r.Delta < 0 ? '#00E676' : '#FF1744'}">${(r.Delta >= 0 ? '+' : '') + r.Delta.toFixed(4)}</td>
                     <td>${(r.sigma_pred*100).toFixed(1)}%</td>
                     <td>${(r.sigma_real*100).toFixed(1)}%</td>
                 </tr>`).join('');
-        } catch(e) { console.error('Error cargando datos:', e); }
+        } catch(e) { console.error(e); }
     }
-    loadData();
+    init();
 </script>
 </body>
 </html>
