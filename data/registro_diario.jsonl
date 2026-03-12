@@ -6,3 +6,4 @@
 {"date": "2026-03-11", "timestamp": "2026-03-11T22:03:06.515169", "Cq": 0.613751, "Lambda": 0.658848, "Delta": -0.167901, "sigma_pred": 0.479934, "sigma_real": 0.113748, "gamma_t": 0.596998, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
 {"date": "2026-03-11", "timestamp": "2026-03-12T12:28:18.394874", "Cq": 0.608722, "Lambda": 0.651282, "Delta": -0.178691, "sigma_pred": 0.470695, "sigma_real": 0.113748, "gamma_t": 0.596998, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
 {"date": "2026-03-11", "timestamp": "2026-03-12T13:24:13.734509", "Cq": 0.608722, "Lambda": 0.651282, "Delta": -0.178691, "sigma_pred": 0.470695, "sigma_real": 0.113748, "gamma_t": 0.596998, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
+{"date": "2026-03-12", "timestamp": "2026-03-12T13:48:52.894969", "Cq": 0.611347, "Lambda": 0.698212, "Delta": -0.074944, "sigma_pred": 0.517408, "sigma_real": 0.118084, "gamma_t": 0.599386, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
