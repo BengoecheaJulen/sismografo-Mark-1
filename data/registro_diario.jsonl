@@ -8,3 +8,4 @@
 {"date": "2026-03-11", "timestamp": "2026-03-12T13:24:13.734509", "Cq": 0.608722, "Lambda": 0.651282, "Delta": -0.178691, "sigma_pred": 0.470695, "sigma_real": 0.113748, "gamma_t": 0.596998, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
 {"date": "2026-03-12", "timestamp": "2026-03-12T13:48:52.894969", "Cq": 0.611347, "Lambda": 0.698212, "Delta": -0.074944, "sigma_pred": 0.517408, "sigma_real": 0.118084, "gamma_t": 0.599386, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
 {"date": "2026-03-12", "timestamp": "2026-03-12T13:57:43.898272", "Cq": 0.611421, "Lambda": 0.69824, "Delta": -0.074867, "sigma_pred": 0.517467, "sigma_real": 0.119398, "gamma_t": 0.599386, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
+{"date": "2026-03-12", "timestamp": "2026-03-12T14:29:15.316701", "Cq": 0.611361, "Lambda": 0.698255, "Delta": -0.074699, "sigma_pred": 0.517457, "sigma_real": 0.118937, "gamma_t": 0.599386, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}

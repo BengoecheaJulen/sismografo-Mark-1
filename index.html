@@ -1,431 +1,108 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Sismógrafo MARK 1</title>
+    <title>SEISMIC · MARK I · Systemic Risk Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #0F172A; color: #E2E8F0; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        header { text-align: center; padding: 30px 0 20px; }
-        header h1 { font-size: 2em; letter-spacing: 2px; color: #F8FAFC; }
-        header p { color: #94A3B8; margin-top: 5px; }
-        .status-card {
-            background: #1E293B; border-radius: 16px; padding: 30px;
-            margin: 20px 0; border-left: 6px solid #DC2626;
-            display: flex; flex-wrap: wrap; gap: 30px; align-items: center;
+        :root {
+            --bg: #020810; --bg-panel: #071220; --bg-card: #0C1E38; --bg-row: #0F2444;
+            --border: rgba(30,90,160,0.28); --border-mid: rgba(60,130,220,0.45); --cyan: #00E5FF;
+            --void: #9C27B0; --crit: #FF1744; --high: #FF3D00; --elev: #FFB300; --stable: #00E676; --bubble: #00B0FF; --xbubble: #E040FB;
+            --t1: #EDF4FD; --t2: #82B8D8; --t3: #3A6080; --grid: rgba(18,55,95,0.3);
         }
-        .status-main { flex: 1; min-width: 250px; }
-        .status-emoji { font-size: 3em; }
-        .status-label { font-size: 1.5em; font-weight: bold; color: #DC2626; }
-        .status-date { color: #94A3B8; font-size: 0.9em; margin-top: 4px; }
-        .metrics { display: flex; flex-wrap: wrap; gap: 15px; flex: 2; }
-        .metric {
-            background: #334155; border-radius: 10px; padding: 15px 20px;
-            min-width: 140px; flex: 1;
-        }
-        .metric-label { color: #94A3B8; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
-        .metric-value { font-size: 1.6em; font-weight: bold; margin-top: 4px; color: #F8FAFC; }
-        .metric-sub { font-size: 0.75em; color: #64748B; margin-top: 2px; }
-        .chart-container {
-            background: #1E293B; border-radius: 16px; padding: 20px;
-            margin: 20px 0; text-align: center;
-        }
-        .chart-container img { max-width: 100%; border-radius: 8px; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; }
-        th { background: #334155; padding: 10px; text-align: left; font-size: 0.85em;
-             color: #94A3B8; text-transform: uppercase; letter-spacing: 1px; }
-        td { padding: 8px 10px; border-bottom: 1px solid #334155; font-size: 0.9em;
-             font-family: 'Courier New', monospace; }
-        tr:hover { background: #334155; }
-        .footer {
-            text-align: center; padding: 30px; color: #475569; font-size: 0.8em;
-        }
-        .footer a { color: #64748B; }
-        .disclaimer {
-            background: #1E293B; border-radius: 10px; padding: 15px; margin: 20px 0;
-            font-size: 0.8em; color: #64748B; border-left: 3px solid #475569;
-        }
-        .tendencia { color: #DC2626; font-weight: bold; }
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: 'Rajdhani', sans-serif; background: var(--bg); color: var(--t1); min-height: 100vh; line-height: 1.5; position:relative; }
+        body::before { content:''; position:fixed; inset:0; background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 48px 48px; pointer-events:none; z-index:0; }
+        .wrap { max-width: 1320px; margin:0 auto; padding: 0 28px 60px; position:relative; z-index:1; }
+        header { padding: 32px 0 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); margin-bottom: 28px; }
+        .brand-text h1 { font-family: 'Orbitron', monospace; font-size: 2.2rem; font-weight:900; letter-spacing: 8px; line-height:1; }
+        .banner { border-radius: 4px; padding: 20px 26px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); }
+        .bnr-pct { font-family: 'Orbitron', monospace; font-size: 2.8rem; font-weight:900; line-height:1; }
+        .mgrid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
+        .mc { background: var(--bg-card); border: 1px solid var(--border); padding: 20px; border-radius: 4px; }
+        .mc-val { font-family: 'Orbitron', monospace; font-size: 2.2rem; font-weight:700; line-height:1; margin-bottom:10px; }
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 22px; }
+        .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 4px; overflow:hidden; }
+        .chart-wrap { padding: 16px; height:220px; position:relative; }
+        table { width:100%; border-collapse:collapse; }
+        th { padding: 11px 10px; font-family: 'Share Tech Mono', monospace; font-size: 0.75rem; color: var(--t3); text-align:center; background: var(--bg-row); border-bottom:1px solid var(--border); }
+        td { padding: 10px; border-bottom: 1px solid rgba(18,50,80,0.35); font-family: 'Share Tech Mono', monospace; text-align:center; color: var(--t2); }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🔴 Sismógrafo MARK 1</h1>
-            <p>MARK 1</p>
-        </header>
+<div class="wrap">
+    <header>
+        <div class="brand"><div class="brand-text"><h1>SEISMIC</h1><p>MARK I · SYSTEMIC RISK INTELLIGENCE</p></div></div>
+        <div id="lastUpdate" style="font-family:'Share Tech Mono'; color:var(--t3)">LOADING...</div>
+    </header>
 
-        <div class="status-card">
-            <div class="status-main">
-                <div class="status-emoji">🔴</div>
-                <div class="status-label">ALERTA MÁXIMA</div>
-                <div class="status-date">Actualizado: 12 March 2026</div>
-            </div>
-            <div class="metrics">
-                <div class="metric">
-                    <div class="metric-label"> C<sub>q</sub></div>
-                    <div class="metric-value">0.6114</div>
-                    <div class="metric-sub">Percentil 97% · <span class="tendencia">↑ Subiendo</span></div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Activación Λ</div>
-                    <div class="metric-value">0.6982</div>
-                    <div class="metric-sub">Probabilidad estados extremos</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">σ predicha</div>
-                    <div class="metric-value">51.75%</div>
-                    <div class="metric-sub">σ real: 11.94%</div>
-                </div>
-                <div class="metric">
-                    <div class="metric-label">Sesgo Δ</div>
-                    <div class="metric-value">-0.0749</div>
-                    <div class="metric-sub">Euforia</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="chart-container">
-            <h3 style="margin-bottom: 15px; color: #F8FAFC;">Dashboard — Últimos 120 días</h3>
-            <img src="dashboard.png" alt="Dashboard Sismógrafo MARK 1">
-        </div>
-
-        <div class="chart-container">
-            <h3 style="margin-bottom: 15px; color: #F8FAFC;">Registro histórico (últimos 30 días)</h3>
-            <div style="overflow-x: auto;">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                            <th>C<sub>q</sub></th>
-                            <th>Λ</th>
-                            <th>Δ</th>
-                            <th>σ pred</th>
-                            <th>σ real</th>
-                            <th>γ(t)</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-        <tr>
-            <td>2026-03-12</td>
-            <td>🔴</td>
-            <td>0.6114</td>
-            <td>0.6982</td>
-            <td>-0.0749</td>
-            <td>0.5175</td>
-            <td>0.1194</td>
-            <td>0.5994</td>
-        </tr>
-        <tr>
-            <td>2026-03-11</td>
-            <td>🔴</td>
-            <td>0.6102</td>
-            <td>0.7031</td>
-            <td>-0.0631</td>
-            <td>0.5218</td>
-            <td>0.1137</td>
-            <td>0.5970</td>
-        </tr>
-        <tr>
-            <td>2026-03-10</td>
-            <td>🔴</td>
-            <td>0.6105</td>
-            <td>0.7077</td>
-            <td>-0.0539</td>
-            <td>0.5266</td>
-            <td>0.1156</td>
-            <td>0.6223</td>
-        </tr>
-        <tr>
-            <td>2026-03-09</td>
-            <td>🔴</td>
-            <td>0.6189</td>
-            <td>0.7204</td>
-            <td>-0.0196</td>
-            <td>0.5430</td>
-            <td>0.1356</td>
-            <td>0.4986</td>
-        </tr>
-        <tr>
-            <td>2026-03-06</td>
-            <td>🔴</td>
-            <td>0.6164</td>
-            <td>0.6891</td>
-            <td>-0.0963</td>
-            <td>0.5104</td>
-            <td>0.1385</td>
-            <td>0.4943</td>
-        </tr>
-        <tr>
-            <td>2026-03-05</td>
-            <td>🔴</td>
-            <td>0.5897</td>
-            <td>0.6531</td>
-            <td>-0.1640</td>
-            <td>0.4648</td>
-            <td>0.1320</td>
-            <td>0.5771</td>
-        </tr>
-        <tr>
-            <td>2026-03-04</td>
-            <td>🔴</td>
-            <td>0.5514</td>
-            <td>0.6373</td>
-            <td>-0.1615</td>
-            <td>0.4352</td>
-            <td>0.1337</td>
-            <td>0.6154</td>
-        </tr>
-        <tr>
-            <td>2026-03-03</td>
-            <td>🔴</td>
-            <td>0.4917</td>
-            <td>0.6239</td>
-            <td>-0.1294</td>
-            <td>0.4008</td>
-            <td>0.1321</td>
-            <td>0.7345</td>
-        </tr>
-        <tr>
-            <td>2026-03-02</td>
-            <td>🟠</td>
-            <td>0.4319</td>
-            <td>0.6305</td>
-            <td>-0.0230</td>
-            <td>0.3846</td>
-            <td>0.1290</td>
-            <td>0.7496</td>
-        </tr>
-        <tr>
-            <td>2026-02-27</td>
-            <td>🟠</td>
-            <td>0.4668</td>
-            <td>0.5800</td>
-            <td>+0.0715</td>
-            <td>0.3547</td>
-            <td>0.1289</td>
-            <td>0.7621</td>
-        </tr>
-        <tr>
-            <td>2026-02-26</td>
-            <td>🟠</td>
-            <td>0.4912</td>
-            <td>0.4623</td>
-            <td>+0.1400</td>
-            <td>0.2723</td>
-            <td>0.1283</td>
-            <td>0.7391</td>
-        </tr>
-        <tr>
-            <td>2026-02-25</td>
-            <td>🟢</td>
-            <td>0.3991</td>
-            <td>0.3590</td>
-            <td>+0.1761</td>
-            <td>0.1804</td>
-            <td>0.1279</td>
-            <td>0.7268</td>
-        </tr>
-        <tr>
-            <td>2026-02-24</td>
-            <td>🟠</td>
-            <td>0.5265</td>
-            <td>0.4068</td>
-            <td>+0.2605</td>
-            <td>0.2441</td>
-            <td>0.1258</td>
-            <td>0.7420</td>
-        </tr>
-        <tr>
-            <td>2026-02-23</td>
-            <td>🟢</td>
-            <td>0.2516</td>
-            <td>0.2438</td>
-            <td>+0.1148</td>
-            <td>0.0929</td>
-            <td>0.1226</td>
-            <td>0.7324</td>
-        </tr>
-        <tr>
-            <td>2026-02-20</td>
-            <td>🟢</td>
-            <td>0.2900</td>
-            <td>0.2361</td>
-            <td>-0.0230</td>
-            <td>0.0964</td>
-            <td>0.1187</td>
-            <td>0.7588</td>
-        </tr>
-        <tr>
-            <td>2026-02-19</td>
-            <td>🟢</td>
-            <td>0.3221</td>
-            <td>0.2495</td>
-            <td>-0.1018</td>
-            <td>0.1080</td>
-            <td>0.1230</td>
-            <td>0.6928</td>
-        </tr>
-        <tr>
-            <td>2026-02-18</td>
-            <td>🟢</td>
-            <td>0.2405</td>
-            <td>0.2387</td>
-            <td>-0.0621</td>
-            <td>0.0889</td>
-            <td>0.1432</td>
-            <td>0.5315</td>
-        </tr>
-        <tr>
-            <td>2026-02-17</td>
-            <td>🟢</td>
-            <td>0.3532</td>
-            <td>0.2547</td>
-            <td>-0.0108</td>
-            <td>0.1163</td>
-            <td>0.1416</td>
-            <td>0.5211</td>
-        </tr>
-        <tr>
-            <td>2026-02-13</td>
-            <td>🟢</td>
-            <td>0.3759</td>
-            <td>0.1930</td>
-            <td>+0.0130</td>
-            <td>0.0936</td>
-            <td>0.1419</td>
-            <td>0.5524</td>
-        </tr>
-        <tr>
-            <td>2026-02-12</td>
-            <td>🟢</td>
-            <td>0.3477</td>
-            <td>0.1892</td>
-            <td>+0.0629</td>
-            <td>0.0872</td>
-            <td>0.1428</td>
-            <td>0.5775</td>
-        </tr>
-        <tr>
-            <td>2026-02-11</td>
-            <td>🟢</td>
-            <td>0.2316</td>
-            <td>0.1652</td>
-            <td>+0.0961</td>
-            <td>0.0607</td>
-            <td>0.1323</td>
-            <td>0.5788</td>
-        </tr>
-        <tr>
-            <td>2026-02-10</td>
-            <td>🟢</td>
-            <td>0.2570</td>
-            <td>0.1859</td>
-            <td>+0.1105</td>
-            <td>0.0715</td>
-            <td>0.1324</td>
-            <td>0.5647</td>
-        </tr>
-        <tr>
-            <td>2026-02-09</td>
-            <td>🟢</td>
-            <td>0.3157</td>
-            <td>0.1686</td>
-            <td>+0.1456</td>
-            <td>0.0743</td>
-            <td>0.1338</td>
-            <td>0.5443</td>
-        </tr>
-        <tr>
-            <td>2026-02-06</td>
-            <td>🟢</td>
-            <td>0.2723</td>
-            <td>0.2059</td>
-            <td>+0.1857</td>
-            <td>0.0813</td>
-            <td>0.1329</td>
-            <td>0.6600</td>
-        </tr>
-        <tr>
-            <td>2026-02-05</td>
-            <td>🟡</td>
-            <td>0.4470</td>
-            <td>0.3886</td>
-            <td>+0.1841</td>
-            <td>0.2104</td>
-            <td>0.1129</td>
-            <td>0.6886</td>
-        </tr>
-        <tr>
-            <td>2026-02-04</td>
-            <td>🟡</td>
-            <td>0.4765</td>
-            <td>0.4047</td>
-            <td>+0.2393</td>
-            <td>0.2287</td>
-            <td>0.1076</td>
-            <td>0.6684</td>
-        </tr>
-        <tr>
-            <td>2026-02-03</td>
-            <td>🟢</td>
-            <td>0.3280</td>
-            <td>0.2838</td>
-            <td>+0.2018</td>
-            <td>0.1250</td>
-            <td>0.1082</td>
-            <td>0.6303</td>
-        </tr>
-        <tr>
-            <td>2026-02-02</td>
-            <td>🟢</td>
-            <td>0.1597</td>
-            <td>0.2899</td>
-            <td>+0.2559</td>
-            <td>0.0959</td>
-            <td>0.1034</td>
-            <td>0.6094</td>
-        </tr>
-        <tr>
-            <td>2026-01-30</td>
-            <td>🟢</td>
-            <td>0.3156</td>
-            <td>0.4567</td>
-            <td>+0.3299</td>
-            <td>0.2184</td>
-            <td>0.1058</td>
-            <td>0.5186</td>
-        </tr>
-        <tr>
-            <td>2026-01-29</td>
-            <td>🟠</td>
-            <td>0.4057</td>
-            <td>0.5666</td>
-            <td>+0.3830</td>
-            <td>0.3233</td>
-            <td>0.1047</td>
-            <td>0.4728</td>
-        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="disclaimer">
-            <strong>Aviso legal:</strong> El MARK1 es un modelo experimental de investigación 
-            . Las señales generadas no constituyen 
-            asesoramiento financiero. Rendimientos pasados no garantizan resultados futuros.
-        </div>
-
-        <div class="footer">
-            <p>· Datos: Yahoo Finance, FRED</p>
-            <p>Código fuente: <a href="https://github.com/BengoecheaJulen/sismografo-cuantico">GitHub</a></p>
-            <p>© 2026 Julen Bengoechea · Proyecto de investigación</p>
-        </div>
+    <div class="banner sync" id="alertBanner">
+        <div><div id="bnrLabel" style="font-family:'Orbitron'; font-size:1.5rem; font-weight:700;">INITIALIZING</div><div id="bnrSub" style="font-family:'Share Tech Mono'; opacity:0.6;">SYNCING DATA...</div></div>
+        <div style="text-align:right;"><div class="bnr-pct" id="bnrPct">—</div><div style="font-family:'Share Tech Mono'; font-size:0.7rem; opacity:0.5;">PERCENTILE</div></div>
     </div>
+
+    <div class="mgrid">
+        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">NEXUS</div><div class="mc-val" id="m-nexus">—</div></div>
+        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">APEX</div><div class="mc-val" id="m-apex">—</div></div>
+        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">PULSE</div><div class="mc-val" id="m-pulse">—</div></div>
+        <div class="mc"><div style="color:var(--t3); font-size:0.7rem; font-family:'Share Tech Mono';">VECTOR</div><div class="mc-val" id="m-vector">—</div></div>
+    </div>
+
+    <div class="charts-grid">
+        <div class="panel" style="grid-column: 1 / -1;"><div class="chart-wrap" style="height:260px;"><canvas id="chartVol"></canvas></div></div>
+        <div class="panel"><div class="chart-wrap"><canvas id="chartNexus"></canvas></div></div>
+        <div class="panel"><div class="chart-wrap"><canvas id="chartApex"></canvas></div></div>
+    </div>
+
+    <div class="panel" style="overflow-x:auto;">
+        <table>
+            <thead><tr><th>DATE</th><th>NEXUS</th><th>APEX</th><th>VECTOR</th><th>PULSE</th><th>REALIZED</th></tr></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const GITHUB_RAW = 'https://raw.githubusercontent.com/BengoecheaJulen/sismografo-MARK-1-engine/main/data/registro_diario.jsonl';
+
+    async function loadData() {
+        try {
+            const res = await fetch(GITHUB_RAW + '?t=' + Date.now());
+            const text = await res.text();
+            const rows = text.trim().split('\n').map(JSON.parse);
+            const latest = rows[rows.length - 1];
+            
+            // Lógica de estados para el banner
+            const cq = latest.Cq;
+            const banner = document.getElementById('alertBanner');
+            if (cq > 0.56) { banner.className = 'banner critical'; document.getElementById('bnrLabel').textContent = 'CRITICAL ALERT'; }
+            else if (cq > 0.49) { banner.className = 'banner high'; document.getElementById('bnrLabel').textContent = 'HIGH RISK'; }
+            else { banner.className = 'banner stable'; document.getElementById('bnrLabel').textContent = 'STABLE REGIME'; }
+
+            document.getElementById('m-nexus').textContent = latest.Cq.toFixed(4);
+            document.getElementById('m-apex').textContent = latest.Lambda.toFixed(4);
+            document.getElementById('m-pulse').textContent = (latest.sigma_pred * 100).toFixed(1) + '%';
+            document.getElementById('m-vector').textContent = (latest.Delta >= 0 ? '+' : '') + latest.Delta.toFixed(3);
+            document.getElementById('bnrPct').textContent = 'P' + Math.round(latest.percentil_Cq || 0);
+            document.getElementById('lastUpdate').textContent = 'LAST SIGNAL: ' + latest.date;
+            
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = rows.slice(-20).reverse().map(r => `
+                <tr>
+                    <td>${r.date}</td>
+                    <td>${r.Cq.toFixed(4)}</td>
+                    <td>${r.Lambda.toFixed(4)}</td>
+                    <td>${(r.Delta >= 0 ? '+' : '') + r.Delta.toFixed(4)}</td>
+                    <td>${(r.sigma_pred*100).toFixed(1)}%</td>
+                    <td>${(r.sigma_real*100).toFixed(1)}%</td>
+                </tr>`).join('');
+        } catch(e) { console.error('Error cargando datos:', e); }
+    }
+    loadData();
+</script>
 </body>
 </html>
