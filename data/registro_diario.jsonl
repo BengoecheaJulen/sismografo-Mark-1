@@ -1,4 +1,3 @@
-
 {"date": "2026-03-09", "timestamp": "2026-03-09T17:12:33.905000", "Cq": 0.12874, "Lambda": 0.058637, "Delta": 0.007987, "sigma_pred": 0.021676, "sigma_real": 0.132591, "gamma_t": 0.498558, "alerta": "CALMA", "percentil_Cq": 5}
 {"date": "2026-03-09", "timestamp": "2026-03-09T17:48:54.581024", "Cq": 0.624643, "Lambda": 0.674683, "Delta": -0.134326, "sigma_pred": 0.499723, "sigma_real": 0.133516, "gamma_t": 0.498558, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
 {"date": "2026-03-09", "timestamp": "2026-03-09T22:03:02.410282", "Cq": 0.624139, "Lambda": 0.674614, "Delta": -0.134665, "sigma_pred": 0.499447, "sigma_real": 0.135631, "gamma_t": 0.498558, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
@@ -13,5 +12,5 @@
 {"date": "2026-03-12", "timestamp": "2026-03-12T14:39:11.522769", "Cq": 0.611581, "Lambda": 0.698337, "Delta": -0.07447, "sigma_pred": 0.517631, "sigma_real": 0.120278, "gamma_t": 0.599386, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
 {"date": "2026-03-12", "timestamp": "2026-03-12T15:07:58.406305", "Cq": 0.607967, "Lambda": 0.644539, "Delta": -0.192684, "sigma_pred": 0.46402, "sigma_real": 0.120165, "gamma_t": 0.599386, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
 {"date": "2026-03-12", "timestamp": "2026-03-12T22:02:49.553772", "Cq": 0.608112, "Lambda": 0.644549, "Delta": -0.192586, "sigma_pred": 0.464086, "sigma_real": 0.123626, "gamma_t": 0.599386, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
-{"date": "2026-03-13", "timestamp": "2026-03-13T22:49:00.380726", "Cq": 0.612714, "Lambda": 0.647738, "Delta": -0.188209, "sigma_pred": 0.468933, "sigma_real": 0.124261, "gamma_t": 0.572317, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 97}
-{"date": "2026-03-13", "timestamp": "2026-03-14T15:44:33.285870", "Cq": 0.5483, "Lambda": 0.778134, "Delta": 0.178579, "sigma_pred": 0.571906, "sigma_real": 0.124261, "gamma_t": 0.572317, "alerta": "ALERTA M\u00c1XIMA", "percentil_Cq": 93}
+{"date": "2026-03-13", "timestamp": "2026-03-14T16:30:05.801702", "Cq": 0.357344, "Lambda": 0.298087, "Delta": 0.172841, "sigma_pred": 0.138025, "sigma_real": 0.124261, "gamma_t": 0.572317, "alerta": "AUTO", "percentil_Cq": 56}
+{"date": "2026-03-13", "timestamp": "2026-03-14T16:30:05.801702", "Cq": 0.357344, "Lambda": 0.298087, "Delta": 0.172841, "sigma_pred": 0.138025, "sigma_real": 0.124261, "gamma_t": 0.572317, "alerta": "AUTO", "percentil_Cq": 56}
